@@ -10,11 +10,15 @@ Thank you for your interest in contributing! hd_connex is an open-source contrac
 - Label the issue with `bug`.
 
 ### Suggesting Features
-- Open a [GitHub Issue](../../issues) with the label `enhancement`.
+- Open a [GitHub Issue](../../issues) with the label "enhancement".
 - Describe the feature, why it’s useful, and any examples of how it could work.
 
 ### Submitting Code Changes
 1. **Fork** the repository.
 2. **Clone** your fork locally:
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/hd_connex.git
+ 
+git clone
+
+https://github.com/YOUR-USERNAME/hd_connex.git
+
+All new functionality should include an accompanying automated test in the "tests" directory.
