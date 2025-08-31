@@ -1,21 +1,13 @@
-{
-  "name": "hd_connex",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "echo \"No tests yet\" && exit 0"
-  },
-  "dependencies": {
-    "next": "14.2.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.2.5"
-  }
-}
+--- a/package.json
++++ b/package.json
+@@ -4,7 +4,8 @@
+   "scripts": {
+     "dev": "next dev",
+     "build": "next build",
+     "start": "next start",
+-    "lint": "next lint"
++    "lint": "next lint",
++    "typecheck": "tsc --noEmit"
+   },
+   "prisma": {
+     "seed": "tsx --require dotenv/config scripts/seed.ts"
