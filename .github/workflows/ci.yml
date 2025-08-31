@@ -1,16 +1,68 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 21.x]
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - run: npm ci || npm install
-      - run: npm run -s build --if-present
-      - run: npm run -s lint --if-present
-      - run: npm run -s test --if-present
+          node-version: ${{ matrix.node-version }}
+          cache: ${{ hashFiles('yarn.lock') != '' && 'yarn' || 'npm' }}
+
+      - name: Install dependencies
+        run: |
+          if [ -f yarn.lock ]; then
+            yarn --frozen-lockfile
+          else
+            npm ci
+          fi
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Type check
+        run: |
+          if npm run | grep -q "typecheck"; then
+            npm run typecheck
+          else
+            npx tsc --noEmit
+          fi
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ matrix.node-version }}
+          path: |
+            .next/
+            public/
